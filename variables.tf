@@ -6,5 +6,5 @@ variable "keypath" {
 variable "allowed_ports" {
     description = "Allowed ports from/to host"
     type        = "list"
-    default     = ["80", "443", "22"]
+    default     = ["22", "80", "443"]
 }
