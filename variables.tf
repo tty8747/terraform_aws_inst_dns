@@ -3,8 +3,14 @@ variable "keypath" {
   description = "path to pub key"
 }
 
-variable "allowed_ports" {
-  description = "Allowed ports from/to host"
+variable "allowed_tcp_ports" {
+  description = "Allowed ports tcp from/to host"
   type        = "list"
-  default     = ["22", "80", "443"]
+  default     = ["22", "53", "80", "443"]
+}
+
+variable "allowed_udp_ports" {
+  description = "Allowed ports udp from/to host"
+  type        = "list"
+  default     = ["53", "1194"]
 }
