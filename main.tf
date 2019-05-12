@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "ingress_udp_ports" {
   count             = "${length(var.allowed_udp_ports)}"
   from_port         = "${element(var.allowed_udp_ports, count.index)}"
   to_port           = "${element(var.allowed_udp_ports, count.index)}"
-  protocol          = "tcp"
+  protocol          = "udp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.aws_sg.id}"
 }
@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "egress_udp_ports" {
   count             = "${length(var.allowed_udp_ports)}"
   from_port         = "${element(var.allowed_udp_ports, count.index)}"
   to_port           = "${element(var.allowed_udp_ports, count.index)}"
-  protocol          = "tcp"
+  protocol          = "udp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.aws_sg.id}"
 }
