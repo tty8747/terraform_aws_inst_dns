@@ -81,12 +81,16 @@ resource "aws_security_group_rule" "allow_all_egress" {
 }
 
 resource "aws_instance" "vpn" {
-  # count = "${length(var.hosts)}"
+  count                       = "${length(var.list_inst_names)}"
   ami                         = "${data.aws_ami_ids.ubuntu.ids[0]}"
   instance_type               = "t2.micro"
   key_name                    = "${aws_key_pair.sshpubkey.id}"
   associate_public_ip_address = true
   vpc_security_group_ids      = ["${aws_security_group.aws_sg.id}"]
+
+  tags {
+    Name = "${element(var.list_inst_names, count.index)}"
+  }
 }
 
 #resource "aws_route53_record" "aws_vm_dns" {

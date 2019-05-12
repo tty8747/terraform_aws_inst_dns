@@ -14,3 +14,9 @@ variable "allowed_udp_ports" {
   type        = "list"
   default     = ["53", "1194"]
 }
+
+variable "list_inst_names" {
+  description = "list of instances names"
+  type        = "list"
+  default     = ["aaaj.ru", "ubukubu.ru"]
+}
