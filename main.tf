@@ -97,3 +97,4 @@ resource "aws_instance" "vpn" {
 #  ttl     = "300"
 #  records = ["${element(aws_instance.aws_vm.*.public_ip, count.index)}"]
 #}
+
