@@ -125,12 +125,13 @@
 
 - name: "Create dir for user files"
   file: 
-    path: "{{ path_to_easy_rsa }}/client-configs/keys"
+    path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
     state: directory
     recurse: "yes"
     owner: "{{ your_user }}"
     group: root
     mode: '0700'
+  with_items: "{{ common_name_clients }}"
 
 - name: "gen-req for all clients"
   become_user: "{{ your_user }}"
@@ -180,30 +181,45 @@
 #      Confirm request details(.*): 'yes'
 #      Enter pass phrase for(.*): "{{ CA_pass }}"
 
-- name: "copy user cert"
+- name: "copy ca.crt to user folders"
   copy:
     remote_src: "yes"
-    src: "{{ item }}" 
-    dest: "{{ path_to_easy_rsa }}/client-configs/keys"
+    src: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ca.crt"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
     owner: "{{ your_user }}"
     group: root
     mode: '0600'
-  with_items:
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ca.crt"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ta.key"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/{{ common_name_clients }}.crt"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/{{ common_name_clients }}.key"
-  tags:
-    - test
+  with_items: "{{ common_name_clients }}"
 
-#   - name: "Uncomment net.ipv4.ip_forward=1"
-#     lineinfile:
-#       dest: /etc/sysctl.conf
-#       regexp: '^#net\.ipv4\.ip_forward=1$'
-#       insertafter: '^# Uncomment the next line to enable packet forwarding for IPv4$'
-#       line: 'net.ipv4.ip_forward=1'
-#       state: present
-#     notify: sysctl -p
+- name: "copy ta.key to user folders"
+  copy:
+    remote_src: "yes"
+    src: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ta.key"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
+    owner: "{{ your_user }}"
+    group: root
+    mode: '0600'
+  with_items: "{{ common_name_clients }}"
+
+- name: "copy certificate to user folders"
+  copy:
+    remote_src: "yes"
+    src: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/{{ item }}.crt"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
+    owner: "{{ your_user }}"
+    group: root
+    mode: '0600'
+  with_items: "{{ common_name_clients }}"
+
+- name: "copy key to user folders"
+  copy:
+    remote_src: "yes"
+    src: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/{{ item }}.key"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
+    owner: "{{ your_user }}"
+    group: root
+    mode: '0600'
+  with_items: "{{ common_name_clients }}"
 
 - name: "Set ip forwarding on in /proc and sysctl -p"
   sysctl:
