@@ -11,3 +11,5 @@
 # .swp files
 .swp
 
+# .retry files
+*.retry
