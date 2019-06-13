@@ -5,18 +5,27 @@
     name: openvpn
     state: present
 
-- name: "Unpack easy-rsa archive"
-  unarchive:
-    src: "{{ link_to_easy_rsa }}"
-    dest: "{{ path_to_easy_rsa }}"
-    remote_src: yes
+- name: "Create dir for easyrsa"
+  file:
+    path: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+    state: directory
+    mode: 0700
     owner: "{{ your_user }}"
     group: root
 
+- name: "Unpack easyrsa archive"
+  unarchive:
+    src: "{{ link_to_easy_rsa }}"
+    dest: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+    extra_opts: [--strip-components=1]
+    remote_src: yes
+    owner: "{{ your_user }}"
+    group: root
+    
 - name: "Push vars"
   template:
     src: "roles/openvpn/templates/vars.j2"
-    dest: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/vars"
+    dest: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/vars"
     owner: "{{ your_user }}"
     group: root
     mode: '0600'
@@ -35,14 +44,14 @@
   command: ./easyrsa init-pki
   register: init_pki
   args:
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
-    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki"
 
 - name: "Build CA"
   become_user: "{{ your_user }}"
   expect:
     echo: "yes"
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
     command: ./easyrsa build-ca
     timeout: 5
     responses:
@@ -56,8 +65,8 @@
   become_user: "{{ your_user }}"
   expect:
     echo: "yes"
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
-    command: ./easyrsa gen-req "{{ common_name }}" nopass
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+    command: ./easyrsa gen-req server nopass
     timeout: 5
     responses:
       Common Name (.*): "{{ common_name }}" 
@@ -68,8 +77,8 @@
   become_user: "{{ your_user }}"
   expect:
     echo: "yes"
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
-    command: ./easyrsa sign-req server "{{ common_name }}"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+    command: ./easyrsa sign-req server server
     timeout: 5
     responses:
       Confirm request details(.*): 'yes'
@@ -81,29 +90,38 @@
   become_user: "{{ your_user }}"
   command: ./easyrsa gen-dh
   args:
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
   when: sign_req.changed
 
 - name: "ta.key"
   become_user: "{{ your_user }}"
   command: openvpn --genkey --secret ta.key
   args:
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki"
   when: sign_req.changed
 
-- name: "copy cert and key to openvpn directory"
+- name: "Create dir for easyrsa"
+  file:
+    path: "/etc/openvpn/{{ common_name }}/"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+
+- name: "copy server ca, cert and key to openvpn directory"
   copy:
     remote_src: "yes"
     src: "{{ item }}" 
-    dest: "/etc/openvpn/"
+    dest: "/etc/openvpn/{{ common_name }}/"
     owner: root
     group: root
-    mode: '0644'
+    mode: '0600'
   with_items:
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/private/{{ common_name }}.key"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/issued/{{ common_name }}.crt"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/dh.pem"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/ta.key"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/server.key"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/server.crt"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/dh.pem"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ta.key"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ca.crt"
 
 - name: "Create dir for user files"
   file: 
@@ -114,28 +132,53 @@
     group: root
     mode: '0700'
 
-- name: "gen-req {{ common_name_clients }}"
+- name: "gen-req for all clients"
   become_user: "{{ your_user }}"
   expect:
     echo: "yes"
-    command: ./easyrsa gen-req "{{ common_name_clients }}" nopass
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
-    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/private/{{ common_name_clients }}.key"
+    command: ./easyrsa gen-req "{{ item }}" nopass
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/{{ item }}.key"
     timeout: 5
     responses:
-      Common Name (.*): "{{ common_name_clients }}" 
+      Common Name (.*): "{{ item }}" 
+  with_items: "{{ common_name_clients }}"
 
-- name: "sign-req {{ common_name_clients }}"
+- name: "sign-req for all clients"
   become_user: "{{ your_user }}"
   expect:
     echo: "yes"
-    command: ./easyrsa sign-req client "{{ common_name_clients }}"
-    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
-    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/issued/{{ common_name_clients }}.crt"
+    command: ./easyrsa sign-req client "{{ item }}"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/{{ item }}.crt"
     timeout: 5
     responses:
       Confirm request details(.*): 'yes'
       Enter pass phrase for(.*): "{{ CA_pass }}"
+  with_items: "{{ common_name_clients }}"
+
+#- name: "gen-req {{ common_name_clients }}"
+#  become_user: "{{ your_user }}"
+#  expect:
+#    echo: "yes"
+#    command: ./easyrsa gen-req "{{ common_name_clients }}" nopass
+#    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+#    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/{{ common_name_clients }}.key"
+#    timeout: 5
+#    responses:
+#      Common Name (.*): "{{ common_name_clients }}" 
+#
+#- name: "sign-req {{ common_name_clients }}"
+#  become_user: "{{ your_user }}"
+#  expect:
+#    echo: "yes"
+#    command: ./easyrsa sign-req client "{{ common_name_clients }}"
+#    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
+#    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/{{ common_name_clients }}.crt"
+#    timeout: 5
+#    responses:
+#      Confirm request details(.*): 'yes'
+#      Enter pass phrase for(.*): "{{ CA_pass }}"
 
 - name: "copy user cert"
   copy:
@@ -146,10 +189,12 @@
     group: root
     mode: '0600'
   with_items:
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/ca.crt"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/ta.key"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/issued/{{ common_name_clients }}.crt"
-    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/private/{{ common_name_clients }}.key"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ca.crt"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/ta.key"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/{{ common_name_clients }}.crt"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/{{ common_name_clients }}.key"
+  tags:
+    - test
 
 #   - name: "Uncomment net.ipv4.ip_forward=1"
 #     lineinfile:

@@ -23,6 +23,7 @@
 # Which local IP address should OpenVPN
 # listen on? (optional)
 ;local a.b.c.d
+local {{ ansible_default_ipv4.address }}
 
 # Which TCP/UDP port should OpenVPN listen on?
 # If you want to run multiple OpenVPN instances
@@ -75,14 +76,14 @@ dev tun
 # Any X509 key management system can be used.
 # OpenVPN can also use a PKCS #12 formatted key file
 # (see "pkcs12" directive in man page).
-ca ca.crt
-cert server.crt
-key server.key  # This file should be kept secret
+ca {{ common_name }}/ca.crt
+cert {{ common_name }}/server.crt
+key {{ common_name }}/server.key  # This file should be kept secret
 
 # Diffie hellman parameters.
 # Generate your own with:
 #   openssl dhparam -out dh2048.pem 2048
-dh dh.pem
+dh {{ common_name}}/dh.pem
 
 # Network topology
 # Should be subnet (addressing via IP)
@@ -243,7 +244,7 @@ keepalive 10 120
 # a copy of this key.
 # The second parameter should be '0'
 # on the server and '1' on the clients.
-tls-auth ta.key 0 # This file is secret
+tls-auth {{ common_name }}/ta.key 0 # This file is secret
 key-direction 0
 
 # Select a cryptographic cipher.

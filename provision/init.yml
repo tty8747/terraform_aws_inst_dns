@@ -1,15 +1,16 @@
 ---
 
-- hosts: all
+- hosts: test
   gather_facts: "no"
   become: "yes"
   remote_user: ubuntu
 
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
-    user_name: goto
+    user_name: deploy
 
   tasks:
+    
   - name: "Installing python & apt update"
     raw: test -x /usr/bin/python3 || apt update && apt -y install python3-minimal
 
