@@ -11,7 +11,7 @@
 
   tasks:
   - name: "Installing python & apt update"
-    raw: test -x /usr/bin/python3 || apt update && apt -y install python3-minimal aptitude 
+    raw: test -x /usr/bin/python3 || apt update && apt -y install python3-minimal
 
   - name: "Set default python3.6"
     raw: test -x /usr/bin/python3 || update-alternatives --install /usr/bin/python3 python /usr/bin/python3.6 1
