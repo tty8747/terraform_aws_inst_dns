@@ -21,6 +21,7 @@
        - cert111
        - cert112
        - cert113
+     vpn_serv_or_ip: 85.192.34.53
 
   roles:
     - { role: common, tags: ['common'] }

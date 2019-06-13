@@ -30,7 +30,7 @@ local {{ ansible_default_ipv4.address }}
 # on the same machine, use a different port
 # number for each one.  You will need to
 # open up this port on your firewall.
-port 1194
+port {{ ovpn_port }}
 
 # TCP or UDP server?
 ;proto tcp

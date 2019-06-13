@@ -28,7 +28,7 @@
     dest: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/vars"
     owner: "{{ your_user }}"
     group: root
-    mode: '0600'
+    mode: 0600
 
 - name: "Push server config"
   template:
@@ -36,7 +36,7 @@
     dest: "/etc/openvpn/{{ common_name }}.conf"
     owner: root
     group: root
-    mode: '0600'
+    mode: 0600
   notify: "Reload OpenVPN@{{ common_name }}"
 
 - name: "Init pki"
@@ -115,7 +115,7 @@
     dest: "/etc/openvpn/{{ common_name }}/"
     owner: root
     group: root
-    mode: '0600'
+    mode: 0600
   with_items:
     - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/server.key"
     - "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/server.crt"
@@ -125,12 +125,12 @@
 
 - name: "Create dir for user files"
   file: 
-    path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
+    path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/"
     state: directory
     recurse: "yes"
     owner: "{{ your_user }}"
     group: root
-    mode: '0700'
+    mode: 0700
   with_items: "{{ common_name_clients }}"
 
 - name: "gen-req for all clients"
@@ -158,29 +158,6 @@
       Enter pass phrase for(.*): "{{ CA_pass }}"
   with_items: "{{ common_name_clients }}"
 
-#- name: "gen-req {{ common_name_clients }}"
-#  become_user: "{{ your_user }}"
-#  expect:
-#    echo: "yes"
-#    command: ./easyrsa gen-req "{{ common_name_clients }}" nopass
-#    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
-#    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/private/{{ common_name_clients }}.key"
-#    timeout: 5
-#    responses:
-#      Common Name (.*): "{{ common_name_clients }}" 
-#
-#- name: "sign-req {{ common_name_clients }}"
-#  become_user: "{{ your_user }}"
-#  expect:
-#    echo: "yes"
-#    command: ./easyrsa sign-req client "{{ common_name_clients }}"
-#    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}"
-#    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_folder }}/pki/issued/{{ common_name_clients }}.crt"
-#    timeout: 5
-#    responses:
-#      Confirm request details(.*): 'yes'
-#      Enter pass phrase for(.*): "{{ CA_pass }}"
-
 - name: "copy ca.crt to user folders"
   copy:
     remote_src: "yes"
@@ -188,7 +165,7 @@
     dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
     owner: "{{ your_user }}"
     group: root
-    mode: '0600'
+    mode: 0600
   with_items: "{{ common_name_clients }}"
 
 - name: "copy ta.key to user folders"
@@ -198,7 +175,7 @@
     dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
     owner: "{{ your_user }}"
     group: root
-    mode: '0600'
+    mode: 0600
   with_items: "{{ common_name_clients }}"
 
 - name: "copy certificate to user folders"
@@ -208,7 +185,7 @@
     dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
     owner: "{{ your_user }}"
     group: root
-    mode: '0600'
+    mode: 0600
   with_items: "{{ common_name_clients }}"
 
 - name: "copy key to user folders"
@@ -218,8 +195,27 @@
     dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
     owner: "{{ your_user }}"
     group: root
-    mode: '0600'
+    mode: 0600
   with_items: "{{ common_name_clients }}"
+
+- name: "Push config to user folders"
+  template:
+    src: "roles/openvpn/templates/client.ovpn.j2"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/{{ common_name }}.ovpn"
+    owner: "{{ your_user }}"
+    group: root
+    mode: 0600
+  with_items: "{{ common_name_clients }}"
+
+- name: "Pack user files"
+  archive: 
+    path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}.zip"
+    format: zip
+    remove: no
+  with_items: "{{ common_name_clients }}"
+  tags:
+    - pack
 
 - name: "Set ip forwarding on in /proc and sysctl -p"
   sysctl:
