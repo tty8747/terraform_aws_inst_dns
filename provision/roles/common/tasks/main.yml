@@ -1,0 +1,14 @@
+---
+
+- name: "Update cache"
+  apt:
+    update_cache: "{{ update_cache }}"
+    cache_valid_time: "{{ cache_valid_time }}"
+
+- name: "Install software"
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - curl
+    - wget

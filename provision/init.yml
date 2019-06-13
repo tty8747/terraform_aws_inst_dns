@@ -1,0 +1,53 @@
+---
+
+- hosts: all
+  gather_facts: "no"
+  become: "yes"
+  remote_user: ubuntu
+
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+    user_name: goto
+
+  tasks:
+  - name: "Installing python & apt update"
+    raw: test -x /usr/bin/python3 || apt update && apt -y install python3-minimal aptitude 
+
+  - name: "Set default python3.6"
+    raw: test -x /usr/bin/python3 || update-alternatives --install /usr/bin/python3 python /usr/bin/python3.6 1
+
+  - name: "Install packages"
+    apt:
+      name: "{{ item }}"
+      state: present
+    vars:
+      item:
+      - aptitude
+      - python3-yaml
+      - python3-jinja2
+      - python3-paramiko
+      - python3-crypto
+      - python3-pexpect
+
+  - name: "Add user {{ user_name }}"
+    user:
+      name: "{{ user_name }}"
+      group: "sudo"
+      shell: "/bin/bash"
+
+  - name: "Set authorized key taken from file"
+    authorized_key:
+      user: "{{ user_name }}"
+      state: present
+      key: "{{ lookup('file', '/home/goto/.ssh/id_rsa.pub') }}"
+
+  - name: "Push config /etc/sudoers"
+    template:
+      src=templates/sudoers.j2
+      dest=/etc/sudoers
+      owner=root
+      group=root
+      mode=0600
+  - name: "Reboot instances"
+    reboot:
+      reboot_timeout: 1800

@@ -1,0 +1,6 @@
+---
+
+- name: "Reload OpenVPN@{{ common_name }}"
+  systemd:
+    name: openvpn
+    state: reloaded

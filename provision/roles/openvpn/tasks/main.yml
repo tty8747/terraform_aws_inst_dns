@@ -1,0 +1,175 @@
+---
+
+- name: "Install openvpn"
+  apt:
+    name: openvpn
+    state: present
+
+- name: "Unpack easy-rsa archive"
+  unarchive:
+    src: "{{ link_to_easy_rsa }}"
+    dest: "{{ path_to_easy_rsa }}"
+    remote_src: yes
+    owner: "{{ your_user }}"
+    group: root
+
+- name: "Push vars"
+  template:
+    src: "roles/openvpn/templates/vars.j2"
+    dest: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/vars"
+    owner: "{{ your_user }}"
+    group: root
+    mode: '0600'
+
+- name: "Push server config"
+  template:
+    src: "roles/openvpn/templates/server.conf.j2"
+    dest: "/etc/openvpn/{{ common_name }}.conf"
+    owner: root
+    group: root
+    mode: '0600'
+  notify: "Reload OpenVPN@{{ common_name }}"
+
+- name: "Init pki"
+  become_user: "{{ your_user }}"
+  command: ./easyrsa init-pki
+  register: init_pki
+  args:
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki"
+
+- name: "Build CA"
+  become_user: "{{ your_user }}"
+  expect:
+    echo: "yes"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    command: ./easyrsa build-ca
+    timeout: 5
+    responses:
+      Enter New CA Key Passphrase(.*): "{{ CA_pass }}"
+      Re-Enter New CA Key Passphrase(.*): "{{ CA_pass }}"
+      (.*)\[Easy-RSA CA\]:$: 'server'
+  register: build_ca
+  when: init_pki.changed
+
+- name: "gen-req {{ common_name }}"
+  become_user: "{{ your_user }}"
+  expect:
+    echo: "yes"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    command: ./easyrsa gen-req "{{ common_name }}" nopass
+    timeout: 5
+    responses:
+      Common Name (.*): "{{ common_name }}" 
+  register: gen_req_server
+  when: build_ca.changed
+
+- name: "sign-req {{ common_name }}"
+  become_user: "{{ your_user }}"
+  expect:
+    echo: "yes"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    command: ./easyrsa sign-req server "{{ common_name }}"
+    timeout: 5
+    responses:
+      Confirm request details(.*): 'yes'
+      Enter pass phrase for(.*): "{{ CA_pass }}"
+  register: sign_req
+  when: gen_req_server.changed
+
+- name: "gen-dh"
+  become_user: "{{ your_user }}"
+  command: ./easyrsa gen-dh
+  args:
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+  when: sign_req.changed
+
+- name: "ta.key"
+  become_user: "{{ your_user }}"
+  command: openvpn --genkey --secret ta.key
+  args:
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki"
+  when: sign_req.changed
+
+- name: "copy cert and key to openvpn directory"
+  copy:
+    remote_src: "yes"
+    src: "{{ item }}" 
+    dest: "/etc/openvpn/"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/private/{{ common_name }}.key"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/issued/{{ common_name }}.crt"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/dh.pem"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/ta.key"
+
+- name: "Create dir for user files"
+  file: 
+    path: "{{ path_to_easy_rsa }}/client-configs/keys"
+    state: directory
+    recurse: "yes"
+    owner: "{{ your_user }}"
+    group: root
+    mode: '0700'
+
+- name: "gen-req {{ common_name_clients }}"
+  become_user: "{{ your_user }}"
+  expect:
+    echo: "yes"
+    command: ./easyrsa gen-req "{{ common_name_clients }}" nopass
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/private/{{ common_name_clients }}.key"
+    timeout: 5
+    responses:
+      Common Name (.*): "{{ common_name_clients }}" 
+
+- name: "sign-req {{ common_name_clients }}"
+  become_user: "{{ your_user }}"
+  expect:
+    echo: "yes"
+    command: ./easyrsa sign-req client "{{ common_name_clients }}"
+    chdir: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}"
+    creates: "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/issued/{{ common_name_clients }}.crt"
+    timeout: 5
+    responses:
+      Confirm request details(.*): 'yes'
+      Enter pass phrase for(.*): "{{ CA_pass }}"
+
+- name: "copy user cert"
+  copy:
+    remote_src: "yes"
+    src: "{{ item }}" 
+    dest: "{{ path_to_easy_rsa }}/client-configs/keys"
+    owner: "{{ your_user }}"
+    group: root
+    mode: '0600'
+  with_items:
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/ca.crt"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/ta.key"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/issued/{{ common_name_clients }}.crt"
+    - "{{ path_to_easy_rsa }}/{{ easyrsa_ver }}/pki/private/{{ common_name_clients }}.key"
+
+#   - name: "Uncomment net.ipv4.ip_forward=1"
+#     lineinfile:
+#       dest: /etc/sysctl.conf
+#       regexp: '^#net\.ipv4\.ip_forward=1$'
+#       insertafter: '^# Uncomment the next line to enable packet forwarding for IPv4$'
+#       line: 'net.ipv4.ip_forward=1'
+#       state: present
+#     notify: sysctl -p
+
+- name: "Set ip forwarding on in /proc and sysctl -p"
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: "yes"
+    state: present
+    reload: "yes"
+
+- name: "Openvpn status started"
+  systemd:
+    state: started
+    name: "openvpn@{{ common_name }}"
+    enabled: "yes"

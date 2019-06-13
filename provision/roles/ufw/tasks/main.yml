@@ -1,0 +1,6 @@
+---
+
+- name: "Allow from the list"
+  ufw:
+    rule: allow
+    name: OpenSSH

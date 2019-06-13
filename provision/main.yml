@@ -1,0 +1,31 @@
+---
+
+- hosts: test
+  remote_user: goto
+  become: "yes"
+  become_user: root
+  become_method: sudo
+
+  vars:
+    update_cache: "yes"
+    cache_valid_time: 3600
+    your_user: goto
+    link_to_easy_rsa: "https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.6/EasyRSA-unix-v3.0.6.tgz"
+    easyrsa_ver: "EasyRSA-v3.0.6"
+    path_to_easy_rsa: "/home/{{ your_user }}"
+    EASYRSA_REQ_COUNTRY: "US"
+    EASYRSA_REQ_PROVINCE: "California"
+    EASYRSA_REQ_CITY: "San Francisco"
+    EASYRSA_REQ_ORG: "Copyleft Certificate Co"
+    EASYRSA_REQ_EMAIL: "me@example.net"
+    EASYRSA_REQ_OU: "My Organizational Unit"
+    CA_pass: "Thoh6De5Rohkoh1fuciethequeeMiac4uyie6Os4igh4oowu3yohh5ooraime4aaChemeishiej7ahNee4phiefee9quohk5xiel"
+    common_name: server100
+    common_name_clients: client106
+
+
+  roles:
+    - { role: common, tags: ['common'] }
+    - { role: ufw, tags: ['ufw'] }
+#   - bind9
+    - { role: openvpn, tags: ['openvpn'] }
