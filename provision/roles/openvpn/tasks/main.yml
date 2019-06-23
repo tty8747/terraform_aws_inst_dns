@@ -217,6 +217,15 @@
   tags:
     - pack
 
+- name: "Fetch client files"
+  fetch:
+    src: "{{ path_to_easy_rsa }}/client-configs/{{ item }}.zip"
+    dest: "/tmp/client-configs/"
+    flat: yes
+  with_items: "{{ common_name_clients }}"
+  tags:
+    - fetch_files
+
 - name: "Set ip forwarding on in /proc and sysctl -p"
   sysctl:
     name: net.ipv4.ip_forward
