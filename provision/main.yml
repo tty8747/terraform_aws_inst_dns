@@ -11,7 +11,7 @@
        - myvpn
        - vpn_cert2
        - vpn_cert3
-     vpn_serv_or_ip: 89.208.209.8
+     vpn_serv_or_ip: ec2-18-184-213-47.eu-central-1.compute.amazonaws.com
 
   roles:
     - { role: common, tags: ['common'] }

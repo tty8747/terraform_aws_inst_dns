@@ -220,7 +220,7 @@
 - name: "Fetch client files"
   fetch:
     src: "{{ path_to_easy_rsa }}/client-configs/{{ item }}.zip"
-    dest: "/tmp/client-configs/"
+    dest: "{{ path_to_save_client_configs }}/"
     flat: yes
   with_items: "{{ common_name_clients }}"
   tags:
