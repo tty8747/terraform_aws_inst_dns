@@ -14,7 +14,7 @@ EASYRSA_REQ_ORG: "Copyleft Certificate Co"
 EASYRSA_REQ_EMAIL: "me@example.net"
 EASYRSA_REQ_OU: "My Organizational Unit"
 CA_pass: "ier4ohbo6si2aidai7ahzuangaishoquohdahjohseixu1pi2meegh0gae8ePohr4ein9jeeMoo5pheeyeegahph9phaisaiX1yo"
-common_name: vpnserver
+common_name: server
 common_name_clients:
   - user_cert1
   - user_cert2

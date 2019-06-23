@@ -2,7 +2,7 @@ client
   
 dev tun
 proto udp
-remote {{ ansible_default_ipv4.address }}
+remote {{ vpn_serv_or_ip }} {{ ovpn_port }}
 
 resolv-retry infinite
 nobind

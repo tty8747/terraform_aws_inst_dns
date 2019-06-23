@@ -9,7 +9,9 @@
   vars:
      common_name_clients:
        - myvpn
-     vpn_serv_or_ip: 89.208.208.140
+       - vpn_cert2
+       - vpn_cert3
+     vpn_serv_or_ip: 89.208.209.8
 
   roles:
     - { role: common, tags: ['common'] }
