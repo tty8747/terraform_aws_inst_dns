@@ -3,4 +3,4 @@ host1 ansible_host=18.185.125.20
 host2 ansible_host=54.93.97.32
 
 [test]
-mail ansible_host=85.192.34.53 # ansible_ssh_user=ubuntu ansible_ssh_port=22
+mail ansible_host=85.192.33.71 # ansible_ssh_user=ubuntu ansible_ssh_port=22

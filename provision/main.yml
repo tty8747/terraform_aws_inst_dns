@@ -8,23 +8,10 @@
 
   vars:
      common_name_clients:
-       - cert101
-       - cert102
-       - cert103
-       - cert104
-       - cert105
-       - cert106
-       - cert107
-       - cert108
-       - cert109
-       - cert110
-       - cert111
-       - cert112
-       - cert113
-     vpn_serv_or_ip: 85.192.34.53
+       - myvpn
+     vpn_serv_or_ip: 89.208.208.140
 
   roles:
     - { role: common, tags: ['common'] }
     - { role: ufw, tags: ['ufw'] }
-#   - bind9
     - { role: openvpn, tags: ['openvpn'] }

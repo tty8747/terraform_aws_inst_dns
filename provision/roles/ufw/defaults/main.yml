@@ -1,0 +1,3 @@
+openvpn_server_network: 10.8.0.0
+used_proto: udp
+used_port: "1194"

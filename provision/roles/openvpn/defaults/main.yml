@@ -1,6 +1,7 @@
 ---
 your_user: deploy
 ovpn_port: 1194
+openvpn_server_network: 10.8.0.0
 vpn_serv_or_ip: my_vpn_server_name
 link_to_easy_rsa: "https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.6/EasyRSA-unix-v3.0.6.tgz"
 easyrsa_ver: "EasyRSA-v3.0.6"
