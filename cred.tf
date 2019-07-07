@@ -6,5 +6,6 @@ provider "aws" {
 
 resource "aws_key_pair" "sshpubkey" {
   key_name   = "goto@mc"
-  public_key = "${file("${var.keypath}")}"
+  public_key = file(var.keypath)
 }
+

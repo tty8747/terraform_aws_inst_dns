@@ -15,7 +15,6 @@ data "aws_ami_ids" "ubuntu" {
 resource "aws_security_group" "aws_sg" {
   name        = "vpn"
   description = "allow necessary traffic"
-
   #  ingress {
   #    from_port   = 1194
   #    to_port     = 1194
@@ -33,42 +32,42 @@ resource "aws_security_group" "aws_sg" {
 
 resource "aws_security_group_rule" "ingress_udp_ports" {
   type              = "ingress"
-  count             = "${length(var.allowed_udp_ports)}"
-  from_port         = "${element(var.allowed_udp_ports, count.index)}"
-  to_port           = "${element(var.allowed_udp_ports, count.index)}"
+  count             = length(var.allowed_udp_ports)
+  from_port         = element(var.allowed_udp_ports, count.index)
+  to_port           = element(var.allowed_udp_ports, count.index)
   protocol          = "udp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.aws_sg.id}"
+  security_group_id = aws_security_group.aws_sg.id
 }
 
 resource "aws_security_group_rule" "egress_udp_ports" {
   type              = "egress"
-  count             = "${length(var.allowed_udp_ports)}"
-  from_port         = "${element(var.allowed_udp_ports, count.index)}"
-  to_port           = "${element(var.allowed_udp_ports, count.index)}"
+  count             = length(var.allowed_udp_ports)
+  from_port         = element(var.allowed_udp_ports, count.index)
+  to_port           = element(var.allowed_udp_ports, count.index)
   protocol          = "udp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.aws_sg.id}"
+  security_group_id = aws_security_group.aws_sg.id
 }
 
 resource "aws_security_group_rule" "ingress_tcp_ports" {
   type              = "ingress"
-  count             = "${length(var.allowed_tcp_ports)}"
-  from_port         = "${element(var.allowed_tcp_ports, count.index)}"
-  to_port           = "${element(var.allowed_tcp_ports, count.index)}"
+  count             = length(var.allowed_tcp_ports)
+  from_port         = element(var.allowed_tcp_ports, count.index)
+  to_port           = element(var.allowed_tcp_ports, count.index)
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.aws_sg.id}"
+  security_group_id = aws_security_group.aws_sg.id
 }
 
 resource "aws_security_group_rule" "egress_tcp_ports" {
   type              = "egress"
-  count             = "${length(var.allowed_tcp_ports)}"
-  from_port         = "${element(var.allowed_tcp_ports, count.index)}"
-  to_port           = "${element(var.allowed_tcp_ports, count.index)}"
+  count             = length(var.allowed_tcp_ports)
+  from_port         = element(var.allowed_tcp_ports, count.index)
+  to_port           = element(var.allowed_tcp_ports, count.index)
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.aws_sg.id}"
+  security_group_id = aws_security_group.aws_sg.id
 }
 
 resource "aws_security_group_rule" "allow_all_egress" {
@@ -77,19 +76,19 @@ resource "aws_security_group_rule" "allow_all_egress" {
   to_port           = -1
   protocol          = -1
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.aws_sg.id}"
+  security_group_id = aws_security_group.aws_sg.id
 }
 
 resource "aws_instance" "vpn" {
-  count                       = "${length(var.list_inst_names)}"
-  ami                         = "${data.aws_ami_ids.ubuntu.ids[0]}"
+  count                       = length(var.list_inst_names)
+  ami                         = data.aws_ami_ids.ubuntu.ids[0]
   instance_type               = "t2.nano"
-  key_name                    = "${aws_key_pair.sshpubkey.id}"
+  key_name                    = aws_key_pair.sshpubkey.id
   associate_public_ip_address = true
-  vpc_security_group_ids      = ["${aws_security_group.aws_sg.id}"]
+  vpc_security_group_ids      = [aws_security_group.aws_sg.id]
 
-  tags {
-    Name = "${element(var.list_inst_names, count.index)}"
+  tags = {
+    Name = element(var.list_inst_names, count.index)
   }
 }
 
@@ -101,4 +100,3 @@ resource "aws_instance" "vpn" {
 #  ttl     = "300"
 #  records = ["${element(aws_instance.aws_vm.*.public_ip, count.index)}"]
 #}
-
