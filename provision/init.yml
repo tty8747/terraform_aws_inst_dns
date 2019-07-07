@@ -1,6 +1,6 @@
 ---
 
-- hosts: test
+- hosts: aws
   gather_facts: "no"
   become: "yes"
   remote_user: ubuntu
@@ -17,6 +17,9 @@
   - name: "Set default python3.6"
     raw: test -x /usr/bin/python3 || update-alternatives --install /usr/bin/python3 python /usr/bin/python3.6 1
 
+# - name: "Install aptitude"
+#   command: apt install aptitude 
+
   - name: "Install packages"
     apt:
       name: "{{ item }}"
@@ -29,6 +32,13 @@
       - python3-paramiko
       - python3-crypto
       - python3-pexpect
+
+  - name: "Upgrade all packages"
+    apt:
+      upgrade: "yes"
+      state: latest
+    tags:
+      - upgrade
 
   - name: "Add user {{ user_name }}"
     user:
