@@ -91,7 +91,32 @@ resource "aws_instance" "vpn" {
 resource "null_resource" "aws_ansible_inventory" {
 	count		= length(var.list_inst_names)
   provisioner "local-exec" {
-	  # command = "echo \"[web]\n${aws_instance.vpn.*.public_dns} ansible_ssh=ubuntu\n\" >> provision/inventory/aws"
-	  command = "echo \"[web]\n${element(aws_instance.vpn.*.public_dns, count.index)} ansible_ssh=ubuntu\n\" >> provision/inventory/aws"
+	  command = "echo \"[web]\n${element(aws_instance.vpn.*.public_dns, count.index)} ansible_ssh=ubuntu\n\" >> provision/inventory/$NAME"
+		environment = {
+			NAME = "aws"
+    }
 	}
+	depends_on = ["aws_instance.vpn"]
 }
+
+#data "template_file" "ansible_vars" {
+#  template = file("./ansible-vars.json.tpl")
+#	vars = {
+#	  address = aws_instance.vpn.*.public_dns
+#	}
+#}
+
+#resource "null_resource" "init_provision" {
+#  count = length(var.list_inst_names)
+#  provisioner "local-exec" {
+#	  command = "sleep 10; ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i provision/inventory/aws provision/init.yml --extra-vars @ansible-vars.json"
+#  }
+##  provisioner "local-exec" {
+##	  command = <<EOT
+##		"sleep 10;
+##		ANSIBLE_HOST_KEY_CHECKING=False;
+##		ansible-playbook -i provision/inventory/aws provision/init.yml
+##		--extra-vars @ansible-vars.json"
+##		EOT
+##  }
+#}
