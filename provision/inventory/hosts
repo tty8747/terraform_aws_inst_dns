@@ -1,7 +1,6 @@
-[aws1]
-host1 ansible_host=18.185.125.20
-host2 ansible_host=54.93.97.32
+[aws]
+host1 ansible_host=ec2-52-58-28-236.eu-central-1.compute.amazonaws.com
+host2 ansible_host=ec2-3-121-195-149.eu-central-1.compute.amazonaws.com
 
 [test]
 # mail ansible_host=ec2-52-28-219-16.eu-central-1.compute.amazonaws.com # ansible_ssh_user=ubuntu ansible_ssh_port=22
-mail ansible_host=ec2-18-184-213-47.eu-central-1.compute.amazonaws.com
