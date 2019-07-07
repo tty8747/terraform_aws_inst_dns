@@ -15,19 +15,6 @@ data "aws_ami_ids" "ubuntu" {
 resource "aws_security_group" "aws_sg" {
   name        = "vpn"
   description = "allow necessary traffic"
-  #  ingress {
-  #    from_port   = 1194
-  #    to_port     = 1194
-  #    protocol    = "udp"
-  #    cidr_blocks = ["0.0.0.0/0"]
-  #  }
-  #
-  #  egress {
-  #    from_port   = 1194
-  #    to_port     = 1194
-  #    protocol    = "udp"
-  #    cidr_blocks = ["0.0.0.0/0"]
-  #  }
 }
 
 resource "aws_security_group_rule" "ingress_udp_ports" {
@@ -100,3 +87,11 @@ resource "aws_instance" "vpn" {
 #  ttl     = "300"
 #  records = ["${element(aws_instance.aws_vm.*.public_ip, count.index)}"]
 #}
+
+resource "null_resource" "aws_ansible_inventory" {
+	count		= length(var.list_inst_names)
+  provisioner "local-exec" {
+	  # command = "echo \"[web]\n${aws_instance.vpn.*.public_dns} ansible_ssh=ubuntu\n\" >> provision/inventory/aws"
+	  command = "echo \"[web]\n${element(aws_instance.vpn.*.public_dns, count.index)} ansible_ssh=ubuntu\n\" >> provision/inventory/aws"
+	}
+}
