@@ -89,15 +89,28 @@ resource "aws_instance" "vpn" {
 #}
 
 resource "null_resource" "aws_ansible_inventory" {
-	count		= length(var.list_inst_names)
+  count = length(var.list_inst_names)
   provisioner "local-exec" {
-	  command = "echo \"[web]\n${element(aws_instance.vpn.*.public_dns, count.index)} ansible_ssh=ubuntu\n\" >> provision/inventory/$NAME"
-		environment = {
-			NAME = "aws"
+    command = "echo \"[web]\n${element(aws_instance.vpn.*.public_dns, count.index)} ansible_ssh=ubuntu\n\" >> provision/inventory/$NAME"
+    environment = {
+      NAME = "aws"
     }
-	}
-	depends_on = ["aws_instance.vpn"]
+  }
+  depends_on = ["aws_instance.vpn"]
 }
+
+resource "null_resource" "ansible_init" {
+  count = length(var.list_inst_names)
+  provisioner "local-exec" {
+    command = "ansible-playbook -i '${element(aws_instance.vpn.*.public_dns, count.index)},' provision/init.yml"
+  }
+}
+
+#resource "null_resource" "gen_ansible_inventory" {
+#  provisioner "local-exec" {
+#    command = templatefile("${path.module}/ansible_inventory.tmpl", { port = 8080, ip_addrs = ["10.0.0.1", "10.0.0.2"] })
+#  }
+#}
 
 #data "template_file" "ansible_vars" {
 #  template = file("./ansible-vars.json.tpl")
