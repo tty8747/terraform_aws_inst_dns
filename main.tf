@@ -102,7 +102,7 @@ resource "null_resource" "aws_ansible_inventory" {
 resource "null_resource" "ansible_init" {
   count = length(var.list_inst_names)
   provisioner "local-exec" {
-    command = "ansible-playbook -i '${element(aws_instance.vpn.*.public_dns, count.index)},' provision/init.yml"
+    command = "sleep 15; ansible-playbook -i '${element(aws_instance.vpn.*.public_dns, count.index)},' provision/init.yml"
   }
 }
 
