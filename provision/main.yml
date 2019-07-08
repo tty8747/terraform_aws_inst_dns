@@ -1,6 +1,6 @@
 ---
 
-- hosts: aws
+- hosts: web
   remote_user: deploy
   become: "yes"
   become_user: root
@@ -11,9 +11,10 @@
        - myvpn
        - vpn_cert2
        - vpn_cert3
-     vpn_serv_or_ip: ec2-18-184-213-47.eu-central-1.compute.amazonaws.com
+     vpn_serv_or_ip: "{{ inventory_hostname }}"
 
   roles:
+    - { role: info, tags: ['info'] }
     - { role: common, tags: ['common'] }
     - { role: ufw, tags: ['ufw'] }
     - { role: openvpn, tags: ['openvpn'] }

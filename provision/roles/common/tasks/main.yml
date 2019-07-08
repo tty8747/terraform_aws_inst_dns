@@ -1,5 +1,14 @@
 ---
 
+- name: upgrade software on "{{inventory_hostname}}"
+  apt:
+    update_cache: "{{ update_cache }}"
+    cache_valid_time: "{{ cache_valid_time }}"
+- name: current host is "{{ansible_hostname}}"
+  apt:
+    update_cache: "{{ update_cache }}"
+    cache_valid_time: "{{ cache_valid_time }}"
+
 - name: "Update cache"
   apt:
     update_cache: "{{ update_cache }}"

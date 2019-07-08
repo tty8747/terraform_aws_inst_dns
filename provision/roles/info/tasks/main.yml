@@ -1,0 +1,9 @@
+---
+
+- name: Inventory_hostname
+  debug: 
+    msg: "{{ inventory_hostname }}"
+
+- name: ansible_hostname
+  debug: 
+    msg: "{{ ansible_hostname }}"
