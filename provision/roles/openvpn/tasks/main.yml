@@ -210,7 +210,7 @@
 - name: "Pack user files"
   archive: 
     path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}"
-    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}.zip"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}___{{ inventory_hostname }}.zip"
     format: zip
     remove: no
   with_items: "{{ common_name_clients }}"
@@ -219,7 +219,7 @@
 
 - name: "Fetch client files"
   fetch:
-    src: "{{ path_to_easy_rsa }}/client-configs/{{ item }}.zip"
+    src: "{{ path_to_easy_rsa }}/client-configs/{{ item }}___{{ inventory_hostname }}.zip"
     dest: "{{ path_to_save_client_configs }}/"
     flat: yes
   with_items: "{{ common_name_clients }}"
