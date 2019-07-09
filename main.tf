@@ -106,6 +106,13 @@ resource "null_resource" "ansible_init" {
   }
 }
 
+resource "null_resource" "ansible_main" {
+  count = length(var.list_inst_names)
+  provisioner "local-exec" {
+    command = "sleep 15; ansible-playbook -i '${element(aws_instance.vpn.*.public_dns, count.index)},' provision/main.yml"
+  }
+}
+
 #resource "null_resource" "gen_ansible_inventory" {
 #  provisioner "local-exec" {
 #    command = templatefile("${path.module}/ansible_inventory.tmpl", { port = 8080, ip_addrs = ["10.0.0.1", "10.0.0.2"] })
