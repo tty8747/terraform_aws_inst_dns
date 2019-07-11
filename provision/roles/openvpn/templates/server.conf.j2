@@ -23,8 +23,8 @@
 # Which local IP address should OpenVPN
 # listen on? (optional)
 ;local a.b.c.d
-# local {{ ansible_default_ipv4.address }}
-local {{ vpn_serv_or_ip }}
+local {{ ansible_default_ipv4.address }}
+# local {{ vpn_serv_or_ip }}
 
 # Which TCP/UDP port should OpenVPN listen on?
 # If you want to run multiple OpenVPN instances
