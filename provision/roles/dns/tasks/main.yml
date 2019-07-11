@@ -5,3 +5,45 @@
     name: bind9
     state: present
     update_cache: yes
+
+- name: "Push named.conf"
+  template:
+    src: "roles/dns/templates/named.conf.j2"
+    dest: "{{ bind_folder }}/named.conf"
+    owner: root
+    group: bind
+    mode: 0640
+  notify: "Reload BIND9"
+
+- name: "Push named.conf.options"
+  template:
+    src: "roles/dns/templates/named.conf.options.j2"
+    dest: "{{ bind_folder }}/named.conf.options"
+    owner: root
+    group: bind
+    mode: 0640
+  notify: "Reload BIND9"
+
+- name: Create /run/bind
+  file:
+    path: "/run/bind"
+    owner: bind
+    group: bind
+    state: directory
+
+- name: Create an insecure file
+  file:
+    path: /var/lib/bind/bind.log
+    owner: bind
+    group: bind
+    mode: '0600'
+    state: touch
+  notify: "Reload BIND9"
+
+- name: "Create a symbolic link"
+  file:
+    src: "/var/lib/bind/bind.log"
+    dest: "/var/log/bind.log"
+    owner: bind
+    group: bind
+    state: link
