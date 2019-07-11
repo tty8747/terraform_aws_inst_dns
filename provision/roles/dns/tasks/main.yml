@@ -24,14 +24,14 @@
     mode: 0640
   notify: "Reload BIND9"
 
-- name: Create /run/bind
+- name: "Create /run/bind"
   file:
     path: "/run/bind"
     owner: bind
     group: bind
     state: directory
 
-- name: Create an insecure file
+- name: "Create bind.log"
   file:
     path: /var/lib/bind/bind.log
     owner: bind
@@ -40,7 +40,7 @@
     state: touch
   notify: "Reload BIND9"
 
-- name: "Create a symbolic link"
+- name: "Create a symbolic link bind.log"
   file:
     src: "/var/lib/bind/bind.log"
     dest: "/var/log/bind.log"
