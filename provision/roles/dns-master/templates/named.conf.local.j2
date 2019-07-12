@@ -1,0 +1,30 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+zone "ubukubu.ru" {
+	type master;
+	file "/etc/bind/db.ubukubu.ru";
+	allow-transfer { 3.122.224.101; }; 
+        //allow-transfer { any; };
+
+	allow-query { any; };
+};
+
+zone "tty.sysopsoncall.com" {
+        type master;
+        file "/etc/bind/db.tty.sysopsoncall.com";
+	allow-transfer { 3.122.224.101; };
+};
+
+zone "aaaj.ru" {
+        type master;
+        file "/etc/bind/db.aaaj.ru";
+        allow-transfer { 3.122.224.101; }; 
+        //allow-transfer { any; };
+        allow-query { any; };
+};

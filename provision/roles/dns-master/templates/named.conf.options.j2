@@ -1,0 +1,50 @@
+options {
+        listen-on port 53 { 127.0.0.1; {{ ansible_default_ipv4.address }}; };
+        listen-on-v6 port 53 { ::1; };
+	directory "/var/cache/bind";
+        dump-file       "/var/cache/bind/cache_dump.db";
+        statistics-file "/var/cache/bind/named_stats.txt";
+        memstatistics-file "/var/cache/bind/named_mem_stats.txt";
+        allow-query     { any; };
+
+        recursion yes;
+
+	/* разрешить только dns c localhost */
+        allow-recursion {
+        	::1;
+		127.0.0.0/8;  
+        };
+
+        forwarders { 
+        1.1.1.1;
+        8.8.8.8;
+        8.8.4.4; 
+        };
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+
+        /* Path to ISC DLV key */
+        bindkeys-file "/etc/named.iscdlv.key";
+
+        managed-keys-directory "{{ bind_folder }}";
+
+        pid-file "/var/run/named/named.pid";
+        session-keyfile "/var/run/named/session.key";
+
+	auth-nxdomain no;    # conform to RFC1035
+	listen-on-v6 { any; };
+};
+
+logging{
+  channel simple_log {
+    file "/var/lib/bind/bind.log" versions 3 size 5m;
+    severity info;
+    print-time yes;
+    print-severity yes;
+    print-category yes;
+  };
+  category default{
+    simple_log;
+  };
+};
