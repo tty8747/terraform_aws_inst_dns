@@ -28,7 +28,7 @@ options {
 
         managed-keys-directory "{{ bind_folder }}";
 
-        pid-file "/var/run/named/bind.pid";
+        pid-file "/var/run/named/named.pid";
         session-keyfile "/var/run/named/session.key";
 
 	auth-nxdomain no;    # conform to RFC1035
@@ -53,7 +53,7 @@ zone "aaaj.ru" {
 logging{
   channel simple_log {
     file "/var/lib/bind/bind.log" versions 3 size 5m;
-    severity warning;
+    severity info;
     print-time yes;
     print-severity yes;
     print-category yes;
