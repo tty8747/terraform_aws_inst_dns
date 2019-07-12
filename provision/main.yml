@@ -18,4 +18,5 @@
     - { role: common, tags: ['common'] }
     - { role: ufw, tags: ['ufw'] }
     - { role: openvpn, tags: ['openvpn'] }
-    - { role: dns, tags: ['dns'] }
+#   - { role: dns-master, tags: ['dns-master'] }
+    - { role: dns-slave, tags: ['dns-slave'] }

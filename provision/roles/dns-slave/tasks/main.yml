@@ -8,7 +8,7 @@
 
 - name: "Push named.conf"
   template:
-    src: "roles/dns/templates/named.conf.j2"
+    src: "roles/dns-slave/templates/named.conf.j2"
     dest: "{{ bind_folder }}/named.conf"
     owner: root
     group: bind
@@ -17,7 +17,7 @@
 
 - name: "Push named.conf.options"
   template:
-    src: "roles/dns/templates/named.conf.options.j2"
+    src: "roles/dns-slave/templates/named.conf.options.j2"
     dest: "{{ bind_folder }}/named.conf.options"
     owner: root
     group: bind
