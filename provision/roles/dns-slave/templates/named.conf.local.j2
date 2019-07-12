@@ -1,0 +1,13 @@
+zone "ubukubu.ru" {
+    type slave;
+    file "/var/cache/bind/ubukubu.ru";
+    masters { 54.93.227.234; };
+    allow-notify { 54.93.227.234; };
+};
+
+zone "aaaj.ru" {
+    type slave;
+    file "/var/cache/bind/aaaj.ru";
+    masters { 54.93.227.234; };
+    allow-notify { 54.93.227.234; };
+};

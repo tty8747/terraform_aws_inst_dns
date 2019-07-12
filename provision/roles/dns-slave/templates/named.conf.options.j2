@@ -18,7 +18,8 @@ options {
         forwarders { 
         1.1.1.1;
         8.8.8.8;
-        8.8.4.4; };
+        8.8.4.4;
+        };
 
         dnssec-enable yes;
         dnssec-validation yes;
@@ -34,21 +35,6 @@ options {
 	auth-nxdomain no;    # conform to RFC1035
 	listen-on-v6 { any; };
 };
-
-zone "ubukubu.ru" {
-	type slave;
-	file "/var/cache/bind/ubukubu.ru";
-	masters { 54.93.227.234; };
-	allow-notify { 54.93.227.234; };
-};
-
-zone "aaaj.ru" {
-	type slave;
-	file "/var/cache/bind/aaaj.ru";
-	masters { 54.93.227.234; };
-	allow-notify { 54.93.227.234; };
-};
-
 
 logging{
   channel simple_log {
