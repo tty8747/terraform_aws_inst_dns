@@ -7,7 +7,7 @@
 #### https://docs.aws.amazon.com/general/latest/gr/rande.html
 #### aws s3api create-bucket --bucket tf-states-es --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
 
-## first start:
+## first start whith terraform:
 * git clone this repo
 * terraform init
 * terraform apply
