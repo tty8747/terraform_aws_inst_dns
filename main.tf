@@ -1,3 +1,21 @@
+resource "aws_s3_bucket" "ec00-bucket" {
+  bucket         = "ec00-bucket"
+  acl            = "private"
+  region         = "eu-central-1"
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = {
+    Name = "bucket for terraform state files"
+  }
+}
+
 data "aws_ami_ids" "ubuntu" {
   filter {
     name   = "name"
