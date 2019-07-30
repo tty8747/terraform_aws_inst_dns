@@ -7,11 +7,24 @@
   become_method: sudo
 
   vars:
+     your_user: deploy
+     path_to_save_client_configs: "/tmp/client-configs"
+     vpn_serv_or_ip: "{{ inventory_hostname }}"
+     link_to_easy_rsa: "https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.6/EasyRSA-unix-v3.0.6.tgz"
+     easyrsa_ver: "EasyRSA-v3.0.6"
+     
+     EASYRSA_REQ_COUNTRY: "DE"
+     EASYRSA_REQ_PROVINCE: "Frankfurt"
+     EASYRSA_REQ_CITY: "Frankfurt"
+     EASYRSA_REQ_ORG: "Copyleft Certificate Co"
+     EASYRSA_REQ_EMAIL: "root@localhost"
+     EASYRSA_REQ_OU: "server"
+     CA_pass: "ooli1Rai0koo8yaiNor2maeh8peev3gohchiogohkif0xohmeik4foh6eexaif3coo4uimeetei9roogaiph2oghaxaingiesaSoog3eimeum2viCie9eeng9quu8sai9quaiWohbeich0OoceeDiQu1Quoothui6ooS2ahheiReikie7keibei1phei6iewoogh2keeKomoopuaZah4aequiphahveeChoon0aeng6ahyufei6Yoe2gai9ui9Oo"
+     
      common_name_clients:
        - myvpn
        - vpn_cert2
        - vpn_cert3
-     vpn_serv_or_ip: "{{ inventory_hostname }}"
 
   roles:
     - { role: info, tags: ['info'] }
