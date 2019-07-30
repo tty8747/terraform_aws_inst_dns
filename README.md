@@ -9,10 +9,17 @@
 
 ## first start whith terraform:
 * git clone this repo
+* $ aws s3api create-bucket --bucket ec00-bucket --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
+* terraform init
+* terraform apply
+
+<!--
+* git clone this repo
 * terraform init
 * terraform apply
 * rename terraform.tf.example to terraform.tf
 * terraform init
+-->
 
 ## ansible: 
 
