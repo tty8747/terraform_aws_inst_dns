@@ -1,22 +1,3 @@
-#resource "aws_s3_bucket" "ec00-bucket" {
-#  bucket         = "ec00-bucket"
-#  acl            = "private"
-#  region         = "eu-central-1"
-#
-#  versioning {
-#    enabled = true
-#  }
-#
-#  lifecycle {
-#   prevent_destroy = true
-#    prevent_destroy = false
-#  }
-#
-#  tags = {
-#    Name = "bucket for terraform state files"
-#  }
-#}
-
 data "aws_ami_ids" "ubuntu" {
   filter {
     name   = "name"
@@ -42,7 +23,7 @@ resource "aws_security_group_rule" "ingress_udp_ports" {
 # count             = length(var.allowed_udp_ports)
 # from_port         = element(var.allowed_udp_ports, count.index)
 # to_port           = element(var.allowed_udp_ports, count.index)
-  for_each          = var.allowed_udp_ports
+  for_each          = var.allowed_udp_ports2
   from_port         = each.value
   to_port           = each.value
   protocol          = "udp"
