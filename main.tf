@@ -19,11 +19,7 @@ resource "aws_security_group" "aws_sg" {
 
 resource "aws_security_group_rule" "ingress_udp_ports" {
   type              = "ingress"
-# Comment for test for_each in terraform 0.12.6
-# count             = length(var.allowed_udp_ports)
-# from_port         = element(var.allowed_udp_ports, count.index)
-# to_port           = element(var.allowed_udp_ports, count.index)
-  for_each          = var.allowed_udp_ports2
+  for_each          = var.allowed_udp_ports
   from_port         = each.value
   to_port           = each.value
   protocol          = "udp"
@@ -33,9 +29,9 @@ resource "aws_security_group_rule" "ingress_udp_ports" {
 
 resource "aws_security_group_rule" "egress_udp_ports" {
   type              = "egress"
-  count             = length(var.allowed_udp_ports)
-  from_port         = element(var.allowed_udp_ports, count.index)
-  to_port           = element(var.allowed_udp_ports, count.index)
+  for_each          = var.allowed_udp_ports
+  from_port         = each.value
+  to_port           = each.value
   protocol          = "udp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.aws_sg.id

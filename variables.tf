@@ -10,12 +10,6 @@ variable "allowed_tcp_ports" {
 }
 
 variable "allowed_udp_ports" {
-  description = "Allowed ports udp from/to host"
-  type        = list(string)
-  default     = ["53", "1194"]
-}
-
-variable "allowed_udp_ports2" {
   description = "Map for test for_each"
   default     = {
     "first"   = 53
