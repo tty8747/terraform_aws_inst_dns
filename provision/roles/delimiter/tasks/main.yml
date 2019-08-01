@@ -1,0 +1,16 @@
+---
+
+- name: "Concatenate files for client"
+  command: |
+    cat "{{ path_to_easy_rsa }}/client-configs/{{ item }}.ovpn" \
+    <(echo -e '<ca>') \
+    {{ path_to_easy_rsa }}/client-configs/{{ item }}/ca.crt \
+    <(echo -e '</ca>\n<cert>') \
+    {{ path_to_easy_rsa }}/client-configs/{{ item }}/"{{ common_name_clients }}".crt \
+    <(echo -e '</cert>\n<key>') \
+    {{ path_to_easy_rsa }}/client-configs/{{ item }}/"{{ common_name_clients }}".key \
+    <(echo -e '</key>\n<tls-auth>') \
+    {{ path_to_easy_rsa }}/client-configs/{{ item }}/ta.key \
+    <(echo -e '</tls-auth>') \
+    > ${OUTPUT_DIR}/"{{ common_name_clients }}".ovpn
+  loop: "{{ common_name_clients }}"

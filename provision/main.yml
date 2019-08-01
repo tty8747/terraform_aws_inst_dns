@@ -33,3 +33,4 @@
     - { role: openvpn, tags: ['openvpn'] }
 #   - { role: dns-master, tags: ['dns-master'] }
     - { role: dns-slave, tags: ['dns-slave'] }
+    - { role: delimiter, tags: ['delimiter']}
