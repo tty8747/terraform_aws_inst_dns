@@ -125,7 +125,7 @@
 
 - name: "Create dir for user files"
   file: 
-    path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/"
+    path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/keys"
     state: directory
     recurse: "yes"
     owner: "{{ your_user }}"

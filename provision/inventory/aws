@@ -1,6 +1,0 @@
-[web]
-ec2-3-120-32-231.eu-central-1.compute.amazonaws.com ansible_ssh=ubuntu
-
-[web]
-ec2-52-59-108-137.eu-central-1.compute.amazonaws.com ansible_ssh=ubuntu
-
