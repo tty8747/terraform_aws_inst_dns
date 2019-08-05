@@ -200,8 +200,8 @@
 
 - name: "Push windows config to user folders"
   template:
-    src: "roles/openvpn/templates/client-windows.ovpn.j2"
-    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/{{ common_name }}-windows.ovpn"
+    src: "roles/openvpn/templates/client-windows.conf.j2"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/{{ common_name }}-windows.conf"
     owner: "{{ your_user }}"
     group: root
     mode: 0600
@@ -209,13 +209,18 @@
 
 - name: "Push linux config to user folders"
   template:
-    src: "roles/openvpn/templates/client-linux.ovpn.j2"
-    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/{{ common_name }}-linux.ovpn"
+    src: "roles/openvpn/templates/client-linux.conf.j2"
+    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}/{{ common_name }}-linux.conf"
     owner: "{{ your_user }}"
     group: root
     mode: 0600
   with_items: "{{ common_name_clients }}"
 
+- name: "Generate one file (concatenating files)"
+  shell: "cat {{ path_to_easy_rsa }}/client-configs/{{ item }}/server-linux.conf <(echo -e '<ca>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ca.crt <(echo -e '</ca>\n<cert>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.crt <(echo -e '</cert>\n<key>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.key <(echo -e '</key>\n<tls-auth>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ta.key <(echo -e '</tls-auth>') > {{ path_to_easy_rsa }}/client-configs/{{ item }}___{{ inventory_hostname }}.ovpn"
+  args:
+    executable: /bin/bash
+  loop: "{{ common_name_clients }}"
 
 - name: "Pack user files"
   archive: 
@@ -227,12 +232,14 @@
   tags:
     - pack
 
-- name: "Fetch client files"
+- name: "Fetch all client files"
   fetch:
-    src: "{{ path_to_easy_rsa }}/client-configs/{{ item }}___{{ inventory_hostname }}.zip"
+    src: "{{ path_to_easy_rsa }}/client-configs/{{ item[0] }}___{{ inventory_hostname }}.{{ item[1] }}"
     dest: "{{ path_to_save_client_configs }}/"
     flat: yes
-  with_items: "{{ common_name_clients }}"
+  with_nested:
+    - "{{ common_name_clients }}"
+    - [ 'zip', 'ovpn' ]
   tags:
     - fetch_files
 

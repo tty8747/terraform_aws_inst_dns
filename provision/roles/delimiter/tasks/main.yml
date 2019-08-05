@@ -1,6 +1,0 @@
----
-
-- name: "Concatenate files for client"
-  command: "cat {{ path_to_easy_rsa }}/client-configs/{{ item }}/server-linux.conf <(echo -e <ca>) {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ca.crt <(echo -e </ca>\n<cert>) {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.crt <(echo -e </cert>\n<key>) {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.key <(echo -e </key>\n<tls-auth>) {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ta.key <(echo -e </tls-auth>) > {{ path_to_easy_rsa }}/client-configs/{{ item }}.ovpn"
-  loop: "{{ common_name_clients }}"
-  # command: "cat {{ path_to_easy_rsa }}/client-configs/{{ item }}/server-linux.conf <(echo -e '<ca>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ca.crt <(echo -e '</ca>\n<cert>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.crt <(echo -e '</cert>\n<key>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.key <(echo -e '</key>\n<tls-auth>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ta.key <(echo -e '</tls-auth>') > {{ path_to_easy_rsa }}/client-configs/{{ item }}.ovpn"

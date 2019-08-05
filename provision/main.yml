@@ -23,8 +23,8 @@
      
      common_name_clients:
        - myvpn
-#       - vpn_cert2
-#       - vpn_cert3
+       - vpn_cert2
+       - vpn_cert3
 
   roles:
     - { role: info, tags: ['info'] }
@@ -33,4 +33,3 @@
     - { role: openvpn, tags: ['openvpn'] }
 #   - { role: dns-master, tags: ['dns-master'] }
     - { role: dns-slave, tags: ['dns-slave'] }
-    - { role: delimiter, tags: ['delimiter']}
