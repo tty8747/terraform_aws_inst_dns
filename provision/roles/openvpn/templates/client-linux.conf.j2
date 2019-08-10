@@ -13,13 +13,8 @@ group nogroup
 persist-key
 persist-tun
 
-ca keys/ca.crt
-cert keys/{{ item }}.crt
-key keys/{{ item }}.key
-
 remote-cert-tls server
 
-tls-auth keys/ta.key 1
 key-direction 1
 
 cipher AES-256-CBC

@@ -20,6 +20,6 @@ variable "allowed_udp_ports" {
 variable "list_inst_names" {
   description = "list of instances names"
   type        = list(string)
-  default     = ["aaaj.ru", "ubukubu.ru"]
+  default     = ["es00.ru"]
 }
 

@@ -216,30 +216,26 @@
     mode: 0600
   with_items: "{{ common_name_clients }}"
 
-- name: "Generate one file (concatenating files)"
-  shell: "cat {{ path_to_easy_rsa }}/client-configs/{{ item }}/server-linux.conf <(echo -e '<ca>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ca.crt <(echo -e '</ca>\n<cert>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.crt <(echo -e '</cert>\n<key>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.key <(echo -e '</key>\n<tls-auth>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ta.key <(echo -e '</tls-auth>') > {{ path_to_easy_rsa }}/client-configs/{{ item }}___{{ inventory_hostname }}.ovpn"
+- name: "Generate one file for linux (concatenating files)"
+  shell: "cat {{ path_to_easy_rsa }}/client-configs/{{ item }}/server-linux.conf <(echo -e '<ca>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ca.crt <(echo -e '</ca>\n<cert>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.crt <(echo -e '</cert>\n<key>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.key <(echo -e '</key>\n<tls-auth>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ta.key <(echo -e '</tls-auth>') > {{ path_to_easy_rsa }}/client-configs/{{ item }}_lin___{{ inventory_hostname }}.ovpn"
   args:
     executable: /bin/bash
   loop: "{{ common_name_clients }}"
 
-- name: "Pack user files"
-  archive: 
-    path: "{{ path_to_easy_rsa }}/client-configs/{{ item }}"
-    dest: "{{ path_to_easy_rsa }}/client-configs/{{ item }}___{{ inventory_hostname }}.zip"
-    format: zip
-    remove: no
-  with_items: "{{ common_name_clients }}"
-  tags:
-    - pack
+- name: "Generate one file for windows (concatenating files)"
+  shell: "cat {{ path_to_easy_rsa }}/client-configs/{{ item }}/server-windows.conf <(echo -e '<ca>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ca.crt <(echo -e '</ca>\n<cert>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.crt <(echo -e '</cert>\n<key>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/{{ item }}.key <(echo -e '</key>\n<tls-auth>') {{ path_to_easy_rsa }}/client-configs/{{ item }}/keys/ta.key <(echo -e '</tls-auth>') > {{ path_to_easy_rsa }}/client-configs/{{ item }}_win___{{ inventory_hostname }}.ovpn"
+  args:
+    executable: /bin/bash
+  loop: "{{ common_name_clients }}"
 
 - name: "Fetch all client files"
   fetch:
-    src: "{{ path_to_easy_rsa }}/client-configs/{{ item[0] }}___{{ inventory_hostname }}.{{ item[1] }}"
+    src: "{{ path_to_easy_rsa }}/client-configs/{{ item[0] }}_{{ item[1] }}___{{ inventory_hostname }}.ovpn"
     dest: "{{ path_to_save_client_configs }}/"
     flat: yes
   with_nested:
     - "{{ common_name_clients }}"
-    - [ 'zip', 'ovpn' ]
+    - [ 'win', 'lin' ]
   tags:
     - fetch_files
 
