@@ -88,16 +88,16 @@ resource "aws_instance" "vpn" {
 #  records = ["${element(aws_instance.aws_vm.*.public_ip, count.index)}"]
 #}
 
-resource "null_resource" "aws_ansible_inventory" {
-  count = length(var.list_inst_names)
-  provisioner "local-exec" {
-    command = "echo \"[web]\n${element(aws_instance.vpn.*.public_dns, count.index)} ansible_ssh=ubuntu\n\" >> provision/inventory/$NAME"
-    environment = {
-      NAME = "aws"
-    }
-  }
-  depends_on = ["aws_instance.vpn"]
-}
+# resource "null_resource" "aws_ansible_inventory" {
+#   count = length(var.list_inst_names)
+#   provisioner "local-exec" {
+#     command = "echo \"[web]\n${element(aws_instance.vpn.*.public_dns, count.index)} ansible_ssh=ubuntu\n\" >> provision/inventory/$NAME"
+#     environment = {
+#       NAME = "aws"
+#     }
+#   }
+#   depends_on = ["aws_instance.vpn"]
+# }
 
 resource "null_resource" "ansible_init" {
   count = length(var.list_inst_names)
