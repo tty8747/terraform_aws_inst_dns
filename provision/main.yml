@@ -19,12 +19,18 @@
      EASYRSA_REQ_ORG: "Copyleft Certificate Co"
      EASYRSA_REQ_EMAIL: "root@localhost"
      EASYRSA_REQ_OU: "server"
-     CA_pass: "ooli1Rai0koo8yaiNor2maeh8peev3gohchiogohkif0xohmeik4foh6eexaif3coo4uimeetei9roogaiph2oghaxaingiesaSoog3eimeum2viCie9eeng9quu8sai9quaiWohbeich0OoceeDiQu1Quoothui6ooS2ahheiReikie7keibei1phei6iewoogh2keeKomoopuaZah4aequiphahveeChoon0aeng6ahyufei6Yoe2gai9ui9Oo"
+     CA_pass: "some_key"
      
      common_name_clients:
-       - myvpn
+       - vpn_cert1
        - vpn_cert2
        - vpn_cert3
+       - vpn_cert4
+       - vpn_cert5
+       - vpn_cert6
+       - vpn_cert7
+       - vpn_cert8
+       - vpn_cert9
 
   roles:
     - { role: info, tags: ['info'] }
@@ -32,4 +38,4 @@
     - { role: ufw, tags: ['ufw'] }
     - { role: openvpn, tags: ['openvpn'] }
 #   - { role: dns-master, tags: ['dns-master'] }
-    - { role: dns-slave, tags: ['dns-slave'] }
+#   - { role: dns-slave, tags: ['dns-slave'] }
