@@ -12,10 +12,7 @@ aws_access_key_id = XXXXXXXXXXXXXXXX
 aws_secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 - `terraform validate`
-- Add variable `ANSIBLE_*` 
-```bash
-export ANSIBLE_CA_PASS=`pwgen 128 1` && echo $ANSIBLE_CA_PASS
-```
+- Set `CA_PASS` into `main.yml`
 - Change parameters inside `provision/main.yml` file
 - `terraform apply` 
 
